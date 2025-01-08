@@ -1,4 +1,4 @@
-package ui.reward;
+package states.map;
 
 import core.Main;
 import ui.Images;
