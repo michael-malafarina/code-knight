@@ -23,7 +23,7 @@ public class RewardOverlay
     {
         if (!active)
         {
-            if(Map.getCurrentNode() instanceof ui.reward.BattleNode)
+            if(Map.getCurrentNode() instanceof states.map.BattleNode)
             {
                 HeroManager.recover();
                 rewardPanelSet.beginLevelUpReward();

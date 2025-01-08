@@ -2,7 +2,7 @@ package states.map;
 
 import core.Utility;
 import org.newdawn.slick.Graphics;
-import ui.reward.BattleNode;
+import states.map.BattleNode;
 
 import java.util.ArrayList;
 
