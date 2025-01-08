@@ -17,10 +17,6 @@ public class Row
         cells.add(new Cell(this, 1));
         cells.add(new Cell(this, 2));
         cells.add(new Cell(this,3));
-        cells.add(new Cell(this,4));
-        cells.add(new Cell(this,5));
-
-
     }
 
     public ArrayList<Cell> getCells()

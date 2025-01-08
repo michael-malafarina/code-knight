@@ -2,25 +2,24 @@ package unit.ability.action;
 
 import unit.ability.Algorithm;
 import animation.AnimatedSpriteSheet;
-import battlefield.Cell;
-import battlefield.Row;
 
 import unit.ability.Ability;
+import unit.ability.action.code.Code;
+import unit.ability.action.code.LinkedCode;
 import unit.ability.conditions.todo.Aim;
 import unit.ability.conditions.Condition;
-import core.Settings;
 import org.newdawn.slick.Image;
 import ui.Images;
 import ui.sound.Sounds;
 import unit.Unit;
-
+import unit.Team;
 
 import java.util.ArrayList;
 
 abstract public class Action extends Ability
 {
-    public final int MID_ACTIVATION_TIME = 10;
-    public final int END_ACTIVATION_TIME = 20;
+    public final int MID_ACTIVATION_TIME = 30;
+    public final int END_ACTIVATION_TIME = 60;
     protected int activationTimer = 0;
     protected boolean activating = false;
 
@@ -39,6 +38,8 @@ abstract public class Action extends Ability
     private Rarity trueRarity;
 
     protected ArrayList<Unit> targets;
+
+    protected Team team;
 
     protected boolean global = false;
     protected int damage = 0;
@@ -85,6 +86,11 @@ abstract public class Action extends Ability
         return time;
     }
 
+    public int getTimer()
+    {
+        return activationTimer;
+    }
+
     abstract public String getDescription();
 
     public void linkUnit(Unit unit)
@@ -92,6 +98,15 @@ abstract public class Action extends Ability
         this.self = unit;
     }
 
+    public void setTeam(Team team)
+    {
+        this.team = team;
+    }
+
+    public Team getTeam()
+    {
+        return team;
+    }
 
     public Image getIcon()
     {
@@ -126,6 +141,10 @@ abstract public class Action extends Ability
     }
 
 
+    public boolean isActive()
+    {
+        return activating;
+    }
 
     public Unit getFrontAlly()
     {
@@ -182,33 +201,33 @@ abstract public class Action extends Ability
         return self.getCurHealth() <= self.getMaxHealth() * .5f;
     }
 
-    public Unit getAllyWithMostActions(Tag type, Tag secondary)
-    {
-        Unit most = null;
-        int mostActions = 0;
-
-        for(Unit u : getAllies())
-        {
-            int count;
-
-            if(secondary == null)
-            {
-                count = u.getAlgorithm().countActions(type);
-            }
-            else
-            {
-                count = u.getAlgorithm().countActions(type, secondary);
-            }
-
-            if(count > mostActions)
-            {
-                most = u;
-                mostActions = count;
-            }
-        }
-
-        return most;
-    }
+//    public Unit getAllyWithMostActions(Tag type, Tag secondary)
+//    {
+//        Unit most = null;
+//        int mostActions = 0;
+//
+//        for(Unit u : getAllies())
+//        {
+//            int count;
+//
+//            if(secondary == null)
+//            {
+//                count = u.getAlgorithm().countActions(type);
+//            }
+//            else
+//            {
+//                count = u.getAlgorithm().countActions(type, secondary);
+//            }
+//
+//            if(count > mostActions)
+//            {
+//                most = u;
+//                mostActions = count;
+//            }
+//        }
+//
+//        return most;
+//    }
 
     public Unit getRandomEnemy()
     {
@@ -242,6 +261,11 @@ abstract public class Action extends Ability
     public ArrayList<Unit> getEnemies()
     {
         return getEnemyRow().getUnits();
+    }
+
+    public Unit getNextAlly()
+    {
+        return getAlgorithm().getNextAlly();
     }
 
     public int countEnemies()
@@ -444,7 +468,7 @@ abstract public class Action extends Ability
 
     public Algorithm getAlgorithm()
     {
-        return self().getAlgorithm();
+        return team.getAlgorithm();
     }
 
     public int getDamage()
@@ -489,42 +513,57 @@ abstract public class Action extends Ability
     {
 //		System.out.println(this + " " + activationTimer + " / " + END_ACTIVATION_TIME);
 
+        setMovement();
+
+
         if (activating)
         {
+
+            if(!(this instanceof Code)) {
+                self().movement(this);
+            }
             activationTimer++;
+
+
         }
 
         if (activationTimer == MID_ACTIVATION_TIME)
         {
-            activationMid();
+            middle();
         }
 
         if (activationTimer == END_ACTIVATION_TIME)
         {
-            activationEnd();
+            end();
         }
     }
 
-    public void activate()
+    public void start()
     {
-        if (self() == null || !self().isAlive())
+        // Non-code cards must exist and be alive
+        if (!(this instanceof Code) && (self() == null || !self().isAlive()))
         {
             return;
         }
 
+//        System.out.println("starting " + this);
 
-        self().loseEnergy(energy);
+        resetTarget();
 
-        if(self().getCurMana() >= getManaCost())
+        if(!(this instanceof Code))
         {
-            self.loseMana(mana, this);
-            animation();
-            sound();
-            paidMana = true;
-        }
-        else
-        {
-            Sounds.noMana.play();
+            self().loseEnergy(energy);
+
+            if(self().getCurMana() >= getManaCost())
+            {
+                self.loseMana(mana, this);
+                paidMana = true;
+            }
+            else
+            {
+                Sounds.noMana.play();
+            }
+
         }
 
         activating = true;
@@ -532,17 +571,26 @@ abstract public class Action extends Ability
 
     }
 
-    public void activationMid()
+    private void middle()
     {
+//        System.out.println("using " + this);
+
+
         if(paidMana)
         {
+            animation();
+            sound();
             use();
             self().getModifiers().triggerActionUsed(this);
             getUnit().addSpeed(getSpeed().getValue());
         }
+        else if(this instanceof Code)
+        {
+            use();
+        }
     }
 
-    public void activationEnd()
+    private void end()
     {
 //		System.out.println("adding " + getDelay() + " delay");
        // getUnit().addDelay(getDelay());
@@ -758,7 +806,7 @@ abstract public class Action extends Ability
 
     public boolean canUse()
     {
-        return self().getCurEnergy() >= energy && !self().getAlgorithm().reachedEnd();
+        return self().getCurEnergy() >= energy && !self().getTeam().getAlgorithm().isDone();
     }
 
     /******************* MUTATORS **************************/

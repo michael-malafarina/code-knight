@@ -5,6 +5,8 @@ import unit.hero.knight.actions.paladin.HolyShield;
 import animation.Animation;
 import ui.Images;
 import unit.enemy.Enemy;
+import unit.hero.mage.actions.fire.Burn;
+import unit.hero.mage.actions.fire.Emberstorm;
 
 public class SkeletonKnight extends Enemy
 {
@@ -19,8 +21,13 @@ public class SkeletonKnight extends Enemy
         addMaxHealth(60);
 //        addStartingBlock(10);
 
-        algorithm.add(new HolyShield());
-        algorithm.add(new AttackKnight());
 
+
+    }
+
+    public void setAbilities()
+    {
+        addAction(new HolyShield());
+        addAction(new AttackKnight());
     }
 }

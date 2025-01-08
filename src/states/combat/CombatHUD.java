@@ -15,19 +15,19 @@ import ui.Fonts;
 import ui.Mouse;
 import ui.Text;
 import ui.algorithm.AlgorithmDisplay;
-import ui.algorithm.AlgorithmDisplaySet;
 import ui.combat.*;
 import ui.message.Message;
 import ui.message.MessageList;
 import ui.reward.RewardOverlay;
+import unit.Team;
 import unit.Unit;
 
 public class CombatHUD
 {
     private int lastSpeed = 1;
 
-    private static AlgorithmDisplaySet algorithmDisplay;
-    private InitiativeDisplay initiatives;
+    private static AlgorithmDisplay algorithmDisplayPlayer;
+    private static AlgorithmDisplay algorithmDisplayEnemy;
     private CurrentActionPanel currentAction;
     private GameSpeedPanel gameSpeedPanel;
 
@@ -44,18 +44,13 @@ public class CombatHUD
     public CombatHUD()
     {
         messages = new MessageList();
-        algorithmDisplay = new AlgorithmDisplaySet();
+        algorithmDisplayPlayer = new AlgorithmDisplay(Team.PLAYER);
+        algorithmDisplayEnemy = new AlgorithmDisplay(Team.ENEMY);
         currentAction = new CurrentActionPanel();
         gameSpeedPanel = new GameSpeedPanel();
         endCombatButton = new EndCombatButton();
         startCombatButton = new StartCombatButton();
 
-    }
-
-
-    public static AlgorithmDisplaySet getAlgorithmDisplaySet()
-    {
-        return algorithmDisplay;
     }
 
     public void setRewardGranted()
@@ -67,17 +62,18 @@ public class CombatHUD
     {
         endCombatButton = new EndCombatButton();
         startCombatButton = new StartCombatButton();
-        algorithmDisplay.begin();
-        initiatives = new InitiativeDisplay();
+        algorithmDisplayPlayer.begin();
+        algorithmDisplayEnemy.begin();
+
     }
 
     public void update()
     {
         messages.update();
         //        System.out.println("*********");
-        algorithmDisplay.update();
+        algorithmDisplayPlayer.update();
+        algorithmDisplayPlayer.update();
 
-        initiatives.update();
 
 
         if (inMovementMode())
@@ -96,7 +92,8 @@ public class CombatHUD
     public void render(Graphics g)
     {
         gameSpeedPanel.render(g);
-        algorithmDisplay.render(g);
+        algorithmDisplayPlayer.render(g);
+        algorithmDisplayEnemy.render(g);
 
         // Always draw moving units on top
         if (movingUnit != null)
@@ -106,12 +103,12 @@ public class CombatHUD
 
         if (!Combat.isBattleOver() && !RewardOverlay.isActive())
         {
-            initiatives.render(g);
             currentAction.render(g);
             messages.render(g);
         }
 
-        algorithmDisplay.renderGrabbedPanel(g);
+        algorithmDisplayPlayer.renderGrabbedPanel(g);
+        algorithmDisplayEnemy.renderGrabbedPanel(g);
 
         if (Combat.getCombatState() == CombatState.SETUP)
         {
@@ -132,9 +129,9 @@ public class CombatHUD
             Text.setFont(Fonts.mediumFont);
             Text.alignTop();
             Text.alignLeft();
-            Text.draw("" + Combat.getCombatState(), 50, 50);
-            Text.draw("Stage " + Map.getStage(), 50, 100);
-            Text.draw("Diff " + EnemyManager.getCombatDifficulty(), 50, 150);
+            Text.draw("" + Combat.getCombatState(), 550, 50);
+            Text.draw("Stage " + Map.getStage(), 550, 100);
+            Text.draw("Diff " + EnemyManager.getCombatDifficulty(), 550, 150);
 
         }
 
@@ -182,13 +179,16 @@ public class CombatHUD
         if (Combat.getCombatState() == CombatState.SETUP && !RewardOverlay.isActive())
         {
             movingUnits();
-            algorithmDisplay.movingActionCards(button, x, y);
+            algorithmDisplayPlayer.mousePressed(button, x, y);
+            algorithmDisplayEnemy.mousePressed(button, x, y);
 
         }
 
         if (RewardOverlay.isActive() && RewardOverlay.isReplacement())
         {
-            algorithmDisplay.selectDeleteCard(RewardOverlay.getUnit());
+            algorithmDisplayPlayer.selectDelete();
+            algorithmDisplayEnemy.selectDelete();
+
         }
 
         gameSpeedPanel.mousePressed(button, x, y);

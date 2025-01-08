@@ -138,7 +138,7 @@ public class PerkRewardPanel extends RewardPanel
     public void giveReward()
     {
         unit.addPerk(perk);
-        unit.getAlgorithm().getDisplay().begin();       // updates the display
+//        unit.getTeam().getAlgorithm().getDisplay().begin();       // updates the display
 
         RewardOverlay.end();
 

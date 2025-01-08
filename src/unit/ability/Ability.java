@@ -45,6 +45,7 @@ public class Ability
     }
 
 
+
 //    public int getApplyStacks()
 //    {
 //        // todo make stack scalar

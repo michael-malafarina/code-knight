@@ -4,8 +4,7 @@ import animation.Animation;
 import core.Color;
 import ui.Images;
 import unit.ability.action.Upgrade;
-import unit.hero.cleric.actions.*;
-import unit.hero.cleric.actions.dawnbringer.HealingLight;
+import unit.hero.cleric.actions.dawnbringer.Dawnbolt;
 import unit.hero.cleric.actions.shadowpriest.Shadowstrike;
 import unit.hero.cleric.perks.Shadowsight;
 
@@ -31,11 +30,7 @@ public class Oracle extends Cleric
 
     public void setStartingAbilities()
     {
-        algorithm.add(new AttackCleric());
-        algorithm.add(new AttackCleric());
-        algorithm.add(new AttackCleric());
-        algorithm.add(new Shadowstrike());
-        algorithm.add(new HealingLight());
+        addAction(new Dawnbolt());
 
         addPerk(new Shadowsight());
     }

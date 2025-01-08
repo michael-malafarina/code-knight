@@ -80,7 +80,7 @@ public class RewardPanelSet
         ArrayList<Action> existingChoices = new ArrayList<>();
         replacement = true;
 
-        CombatHUD.getAlgorithmDisplaySet().getAlgorithmDisplay(getUnit()).getActionPanel(0).setDeleteTarget(true);
+//        CombatHUD.getAlgorithmDisplaySet().getAlgorithmDisplay(getUnit()).getActionPanel(0).setDeleteTarget(true);
 
         for (int i = 0; i < numRewardsUpper; i++)
         {

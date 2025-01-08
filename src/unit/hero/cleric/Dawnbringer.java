@@ -4,9 +4,8 @@ import animation.Animation;
 import core.Color;
 import ui.Images;
 import unit.ability.action.Upgrade;
-import unit.hero.cleric.actions.*;
 import unit.hero.cleric.actions.dawnbringer.Flamestrike;
-import unit.hero.cleric.actions.dawnbringer.HealingLight;
+import unit.hero.cleric.actions.dawnbringer.MendWounds;
 import unit.hero.cleric.actions.dawnbringer.Dawnbolt;
 import unit.hero.cleric.perks.*;
 
@@ -35,12 +34,19 @@ public class Dawnbringer extends Cleric
 
     public void setStartingAbilities()
     {
-        algorithm.add(new Dawnbolt());
-        algorithm.add(new Dawnbolt());
-        algorithm.add(new Flamestrike());
-        algorithm.add(new HealingLight());
-        algorithm.add(new HealingLight());
-        addPerk(new Morninglord());
+        addAction(new Dawnbolt());
+        addAction(new MendWounds());
+//        addAction(new Dawnbolt());
+//        addAction(new MendWounds());
+//        addAction(new Dawnbolt());
+//        addAction(new MendWounds());
+//        addAction(new Dawnbolt());
+//        addAction(new MendWounds());
+//        addAction(new Dawnbolt());
+//        addAction(new MendWounds());
+
+
+//        addPerk(new Morninglord());
     }
 
     public void setUpgradePool()
@@ -55,7 +61,7 @@ public class Dawnbringer extends Cleric
 
         actionPool.add(Dawnbolt.class);
         actionPool.add(Flamestrike.class);
-        actionPool.add(HealingLight.class);
+        actionPool.add(MendWounds.class);
 
     }
 

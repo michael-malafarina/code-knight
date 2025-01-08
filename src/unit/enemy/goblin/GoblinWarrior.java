@@ -20,10 +20,15 @@ public class GoblinWarrior extends Goblin
         addMaxHealth(95);
         addSpeedPerTurn(5);
 
-        algorithm.add(new GoblinSlash());
-        algorithm.add(new GoblinSlash());
-        algorithm.add(new GoblinShield());
-        algorithm.add(new GoblinWarcry());
+
 
     }
+    public void setAbilities()
+    {
+        addAction(new GoblinSlash());
+//        addAction(new GoblinSlash());
+        addAction(new GoblinShield());
+//        addAction(new GoblinWarcry());
+    }
+
 }

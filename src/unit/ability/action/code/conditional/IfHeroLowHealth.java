@@ -2,17 +2,21 @@ package unit.ability.action.code.conditional;
 
 import unit.Unit;
 
-public class IfAllyLowHealth extends Conditional
+import java.util.ArrayList;
+
+public class IfHeroLowHealth extends Conditional
 {
     public void setup()
     {
         super.setup();
-        name = "If Ally Low Health";
+        name = "If Hero Health < 50%";
     }
 
     public boolean conditionIsTrue()
     {
-        for(Unit u : getEnemies())
+        ArrayList<Unit> units = getTeam().getEnemyRow().getUnits();
+
+        for(Unit u : units)
         {
             if(u.isLowHealth())
             {
@@ -24,6 +28,6 @@ public class IfAllyLowHealth extends Conditional
 
     public String getDescription()
     {
-        return "If you or at least one ally is below 50% health, activate the next ability.";
+        return "If at least one hero is below 50% health, activate the next ability.";
     }
 }

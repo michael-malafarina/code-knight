@@ -32,7 +32,6 @@ public class Recruit extends BasicGameState
 	{		
 		this.sbg = sbg;
 
-		HeroManager.newParty();
 
 	}
 

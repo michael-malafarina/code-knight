@@ -7,6 +7,8 @@ import unit.hero.warrior.actions.*;
 import unit.hero.warrior.actions.vanguard.Bastion;
 import unit.hero.warrior.actions.vanguard.Charge;
 import unit.hero.warrior.actions.vanguard.Warcry;
+import unit.hero.warrior.actions.warden.Slash;
+import unit.hero.warrior.actions.warden.Thornskin;
 import unit.hero.warrior.perks.BattefrontLeader;
 
 public class Vanguard extends Warrior
@@ -33,12 +35,15 @@ public class Vanguard extends Warrior
 
     public void setStartingAbilities()
     {
-        algorithm.add(new Charge());
-        algorithm.add(new Charge());
-        algorithm.add(new Bastion());
-        algorithm.add(new Bastion());
-        algorithm.add(new Warcry());
-        addPerk(new BattefrontLeader());
+        addAction(new Slash());
+        addAction(new Bastion());            // make it a defensive shout instead
+
+//        algorithm.add(new Charge());
+//        algorithm.add(new Charge());
+//        algorithm.add(new Bastion());
+//        algorithm.add(new Bastion());
+//        algorithm.add(new Warcry());
+      //  addPerk(new BattefrontLeader());
     }
 
     public void setUpgradePool()

@@ -1,5 +1,8 @@
 package unit.enemy.robot;
 
+import unit.enemy.goblin.actions.warrior.GoblinShield;
+import unit.enemy.goblin.actions.warrior.GoblinSlash;
+import unit.enemy.goblin.actions.warrior.GoblinWarcry;
 import unit.hero.knight.actions.paladin.HolyShield;
 import unit.hero.knight.actions.Protect;
 import unit.hero.knight.actions.SteelYourself;
@@ -22,10 +25,13 @@ public class RobotKnight extends Enemy
         addMaxMana(2);
         addMaxHealth(70);
 
-        algorithm.add(new AttackWarrior());
-        algorithm.add(new Protect());
-        algorithm.add(new SteelYourself());
-        algorithm.add(new HolyShield());
 
+
+    }
+
+    public void setAbilities()
+    {
+        addAction(new AttackWarrior());
+        addAction(new Protect());
     }
 }

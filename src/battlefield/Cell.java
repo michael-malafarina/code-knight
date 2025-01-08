@@ -63,11 +63,11 @@ public class Cell
     {
         if (row == Team.PLAYER.getRow())
         {
-            return indent + (4 - position) * (width + spacing) - width / 2;
+            return indent + (4 - position) * (width + spacing) - width / 2; //+ Main.getScreenWidth() * .075f;
         }
         else
         {
-            return Main.getScreenWidth() - (4 - position) * (width + spacing) - width / 2 - indent;
+            return Main.getScreenWidth() - (4 - position) * (width + spacing) - width / 2 - indent;// + Main.getScreenWidth() * .075f;
         }
     }
 

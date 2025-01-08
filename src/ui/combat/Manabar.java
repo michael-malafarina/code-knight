@@ -7,7 +7,7 @@ import ui.Fonts;
 import ui.Text;
 import unit.Unit;
 
-public class Healthbar
+public class Manabar
 {
     private Unit unit;
     private float xOff;
@@ -15,7 +15,7 @@ public class Healthbar
     private float width;
     private float height;
 
-    public Healthbar(Unit unit)
+    public Manabar(Unit unit)
     {
         this.unit = unit;
     }
@@ -27,27 +27,21 @@ public class Healthbar
 
     public void render(Graphics g)
     {
+        if(unit.getMaxMana() == 0)
+        {
+            return;
+        }
+
         xOff = -1 * Main.getGameScale();
         yOff = 0 * Main.getGameScale() + unit.getAnimation().getHeight();
         width = 38 * Main.getGameScale();
         height = 4 * Main.getGameScale();
 
         float x = unit.getX() + xOff;
-        float y = unit.getY() + yOff;
+        float y = unit.getY() + yOff + height;
 
-        Color background = new Color(50, 9, 0);
-        Color foreground = new Color(180, 0, 0);
-
-        if(unit.getBlock() > 0)
-        {
-            background = new Color(0, 0, 50);
-            foreground = new Color(20, 60, 180);
-        }
-        else if(unit.isLowHealth())
-        {
-            background = new Color(30, 0, 0);
-            foreground = new Color(140, 0, 0);
-        }
+        Color background = new Color(0, 22, 50);
+        Color foreground = new Color(0, 90, 180);
 
         // Draw Healthbar
         g.setLineWidth(2);
@@ -57,9 +51,9 @@ public class Healthbar
         g.drawRect(x, y, width, height);
 
         g.setColor(foreground);
-        g.fillRect(x, y, width * unit.getPercentHealth(), height);
+        g.fillRect(x, y, width * unit.getPercentMana(), height);
         g.setColor(new Color(0, 0, 0));
-        g.drawRect(x, y, width * unit.getPercentHealth(), height);
+        g.drawRect(x, y, width * unit.getPercentMana(), height);
         g.resetLineWidth();
 
         // Draw Health Value
@@ -70,7 +64,7 @@ public class Healthbar
         Text.alignCenter();
         Text.alignMiddle();
 
-        Text.draw(unit.getCurHealth()+"/" + unit.getMaxHealth(), x + width/2, y + height/2+2);
+        Text.draw(unit.getCurMana()+"/" + unit.getMaxMana(), x + width/2, y + height/2+2);
         Text.shadowOff();
     }
 }

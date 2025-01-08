@@ -24,7 +24,8 @@ public class DivineStrength extends Action
 
     public void setTarget()
     {
-        targets.add(getAllyWithMostActions(Tag.ATTACK, Tag.PHYSICAL));
+        targets.add(getFrontAlly());
+//        targets.add(getAllyWithMostActions(Tag.ATTACK, Tag.PHYSICAL));
     }
 
     public void use()

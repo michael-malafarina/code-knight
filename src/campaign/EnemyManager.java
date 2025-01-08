@@ -7,6 +7,7 @@ import states.map.Map;
 import ui.panel.Panel;
 import unit.Team;
 import unit.Unit;
+import unit.ability.Algorithm;
 import unit.enemy.Enemy;
 import unit.enemy.skeleton.Skeleton;
 import unit.enemy.skeleton.SkeletonArcher;
@@ -20,19 +21,27 @@ public class EnemyManager
 	protected static ArrayList<Enemy> enemies;
 	private static int position = 0;
 
+	private static Algorithm algorithm;
+
 	private static Faction faction;
 	private static int skips;
 	public static void init()
 	{
 
+		algorithm = new Algorithm(Team.ENEMY);
 		enemies = new ArrayList<>();
 		faction = new Monsters();
 
 	}
 
+	public static Algorithm getAlgorithm()
+	{
+		return algorithm;
+	}
+
 	public static int getCombatDifficulty()
 	{
-		return (Map.getStage() - 2) + HeroManager.getUnits().size() * 2;
+		return (Map.getStage() - 2) + HeroManager.getUnits().size();
 	}
 
 	public static ArrayList<Enemy> getUnits()
@@ -74,16 +83,18 @@ public class EnemyManager
 		}
 
 		// 25% chance to skip any given cell
-		if(skips > 0 && Math.random() > .75f)
-		{
-			position++;
-			skips--;
-		}
+//		if(skips > 0 && Math.random() > .75f)
+//		{
+//			position++;
+//			skips--;
+//		}
 
-		u.setTeam(Team.ENEMY);
 		u.setCell(position);
 		position++;
 		enemies.add(u);
+
+		u.setAbilities();
+
 	}
 
 	public static void clear()
@@ -101,6 +112,8 @@ public class EnemyManager
 				}
 			}
 		}
+
+		algorithm = new Algorithm(Team.ENEMY);
 		enemies.clear();
 		position = 0;
 	}

@@ -12,10 +12,10 @@ public class StartCombatButton extends Panel
 
     public StartCombatButton()
     {
-        width = 400;
+        width = Main.getScreenWidth() * .10f;
         height = 120;
-        x = Main.getScreenWidth() * .85f - width * .5f;
-        y = Main.getScreenHeight() * .85f - height * .5f;
+        x = Main.getScreenWidth() * .025f;
+        y = Main.getScreenHeight() * .975f - height ;
 
         name = "Start Battle";
 

@@ -5,6 +5,7 @@ import core.Color;
 import ui.Images;
 import unit.ability.action.Upgrade;
 import unit.hero.warrior.actions.AttackWarrior;
+import unit.hero.warrior.actions.vanguard.Charge;
 import unit.hero.warrior.actions.warden.Lacerate;
 import unit.hero.warrior.actions.warden.Regrowth;
 import unit.hero.warrior.actions.warden.Slash;
@@ -34,12 +35,15 @@ public class Warden extends Warrior
 
     public void setStartingAbilities()
     {
-        algorithm.add(new Slash());
-        algorithm.add(new Slash());
-        algorithm.add(new Regrowth());
-        algorithm.add(new Regrowth());
-        algorithm.add(new Thornskin());
-        addPerk(new Oakheart());
+        addAction(new Slash());
+        addAction(new Thornskin());
+
+//        algorithm.add(new Slash());
+//        algorithm.add(new Slash());
+//        algorithm.add(new Regrowth());
+//        algorithm.add(new Regrowth());
+//        algorithm.add(new Thornskin());
+    //    addPerk(new Oakheart());
     }
 
     public void setUpgradePool()
@@ -53,8 +57,7 @@ public class Warden extends Warrior
     {
         super.setActionPool();
 
-        actionPool.add(Slash.class);
-        actionPool.add(Lacerate.class);
+
         actionPool.add(Thornskin.class);
         actionPool.add(Regrowth.class);
 

@@ -4,9 +4,8 @@ import animation.Animation;
 import core.Color;
 import ui.Images;
 import unit.ability.action.Upgrade;
-import unit.hero.cleric.actions.*;
+import unit.hero.cleric.actions.dawnbringer.MendWounds;
 import unit.hero.cleric.actions.runepriest.*;
-import unit.hero.cleric.perks.RuneOfPower;
 
 public class Runepriest extends Cleric
 {
@@ -31,12 +30,10 @@ public class Runepriest extends Cleric
 
     public void setStartingAbilities()
     {
-        algorithm.add(new Zeal());
-        algorithm.add(new Zeal());
-        algorithm.add(new HealingStrike());
-        algorithm.add(new HealingStrike());
-        algorithm.add(new Bless());
-        addPerk(new RuneOfPower());
+        addAction(new RunicStrike());
+        addAction(new MendWounds());
+
+//        addPerk(new RuneOfPower());
     }
 
     public void setUpgradePool()

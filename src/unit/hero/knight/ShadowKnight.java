@@ -3,10 +3,11 @@ package unit.hero.knight;
 import animation.Animation;
 import core.Color;
 import ui.Images;
+import unit.hero.knight.actions.Defend;
+import unit.hero.knight.actions.shadowKnight.Blackwall;
 import unit.hero.knight.actions.shadowKnight.Shroud;
 import unit.hero.knight.actions.shadowKnight.DarkStrike;
 import unit.hero.knight.actions.shadowKnight.Lifetap;
-import unit.hero.knight.perks.GrimAura;
 import unit.hero.knight.perks.ReactiveShield;
 
 public class ShadowKnight extends Knight
@@ -34,12 +35,10 @@ public class ShadowKnight extends Knight
 
     public void setStartingAbilities()
     {
-        algorithm.add(new DarkStrike());
-        algorithm.add(new DarkStrike());
-        algorithm.add(new Shroud());
-        algorithm.add(new Shroud());
-        algorithm.add(new Lifetap());
-        addPerk(new GrimAura());
+        addAction(new DarkStrike());
+        addAction(new Defend());
+
+//        addPerk(new GrimAura());
     }
 
     public void setUpgradePool()

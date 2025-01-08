@@ -1,41 +1,67 @@
 package unit.ability;
 
 import core.Utility;
+import unit.Team;
 import unit.ability.action.Action;
 import unit.ability.action.Rarity;
 import unit.ability.action.Tag;
 import unit.ability.action.code.Code;
 import unit.ability.action.code.LinkedCode;
-import ui.algorithm.AlgorithmDisplay;
 import unit.Unit;
+import unit.ability.action.code.conditional.IfEnemyLowHealth;
+import unit.ability.action.code.conditional.IfFirstUse;
+import unit.ability.action.code.conditional.IfHeroLowHealth;
 
 import java.util.ArrayList;
 
 public class Algorithm
 {
-    private Unit unit;
     private int index;
     private ArrayList<Action> abilities;
-    //    private boolean reachedEnd = false;
-    private AlgorithmDisplay display;
+    private Team team;
 
-    public Algorithm(Unit unit)
+    public Algorithm(Team team)
     {
-        this.unit = unit;
+
         abilities = new ArrayList<>();
+        this.team = team;
+
+        if(team == Team.PLAYER) {
+//            add(new IfEnemyLowHealth(), null);
+//            add(new IfFirstUse(), null);
+//            add(new IfHeroLowHealth(), null);
+//            add(new IfHeroLowHealth(), null);
+
+        }
     }
 
-    public boolean reachedEnd()
+    public void update()
+    {
+        for(Action a : abilities)
+        {
+            if(a.getUnit() != null && !a.getUnit().canAct())
+            {
+                a.disable();
+            }
+        }
+    }
+
+    public boolean isDone()
     {
         return index == abilities.size();
     }
 
-    public void add(Action action)
+    public boolean atStart()
     {
-        add(action, action.getRarity());
+        return index == 0;
     }
 
-    public void addRandomPosition(Action action)
+    public void add(Action action, Unit unit)
+    {
+        add(action, action.getRarity(), unit);
+    }
+
+    public void addRandomPosition(Action action, Unit unit)
     {
         action.setRarity(action.getRarity());
         action.linkUnit(unit);
@@ -46,10 +72,11 @@ public class Algorithm
 
     }
 
-    public void add(Action action, Rarity rarity)
+    public void add(Action action, Rarity rarity, Unit unit)
     {
         action.setRarity(rarity);
-        action.linkUnit(unit);
+        action.setTeam(team);
+
         if (action instanceof Code)
         {
             abilities.addFirst(action);
@@ -57,6 +84,7 @@ public class Algorithm
         else
         {
             abilities.add(action);
+            action.linkUnit(unit);
         }
     }
 
@@ -64,7 +92,6 @@ public class Algorithm
     {
         for (int i = 0; i < abilities.size(); i++)
         {
-//            System.out.println(abilities.get(i).isDelete());
 
             if (abilities.get(i).isDelete())
             {
@@ -73,15 +100,44 @@ public class Algorithm
         }
     }
 
-    public Unit getUnit()
+    public Action getCurrentAction()
     {
-        return unit;
+        if(index < abilities.size())
+        {
+            return abilities.get(index);
+        }
+        return null;
     }
 
+    public Action getPreviousAction()
+    {
+        if(index - 1 > 0)
+        {
+            return abilities.get(index - 1);
+        }
+        return null;
+    }
 
     public Action getNextAction()
     {
-        return abilities.get(index);
+        if(index + 1 < abilities.size())
+        {
+            return abilities.get(index + 1);
+        }
+        return null;
+    }
+
+    public Unit getNextAlly()
+    {
+        for(int i = index; i < abilities.size(); i++)
+        {
+            if(abilities.get(i).getUnit() != null)
+            {
+                return abilities.get(i).getUnit();
+            }
+        }
+
+        return null;
     }
 
     public Action getFirstAction()
@@ -113,17 +169,15 @@ public class Algorithm
     {
         index++;
 
-        if (index == abilities.size())
+        while(index < abilities.size() && getCurrentAction().isDisabled())
         {
-            reset();
-//           reachedEnd = true;
+            index++;
         }
     }
 
     public void reset()
     {
         index = 0;
-        unit.endCycle();
 
         for (Action a : abilities)
         {
@@ -135,7 +189,8 @@ public class Algorithm
             a.resetBattle();
         }
 
-//        reachedEnd = false;
+        update();
+
 
     }
 
@@ -226,17 +281,6 @@ public class Algorithm
         }
 
         return count;
-    }
-
-
-    public void setDisplay(AlgorithmDisplay display)
-    {
-        this.display = display;
-    }
-
-    public AlgorithmDisplay getDisplay()
-    {
-        return display;
     }
 
 

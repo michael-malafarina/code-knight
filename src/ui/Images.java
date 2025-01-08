@@ -48,6 +48,8 @@ public class Images
 	public static Image backgroundDungeon;
 	public static Image backgroundDungeonMap;
 
+	public static Image abstractBorder;
+
 	// Condition Icons
 	public static Image conditionAim;
 	public static Image conditionDefense;
@@ -211,6 +213,8 @@ public class Images
 		backgroundTitle = new Image("res/backgrounds/title.png");
 		backgroundDungeon = new Image("res/backgrounds/dungeon.png");
 		backgroundDungeonMap = new Image("res/backgrounds/dungeonMap.png");
+		abstractBorder = new Image("res/backgrounds/abstractBorder.png");
+
 	}
 	
 	public static void loadUnits() throws SlickException

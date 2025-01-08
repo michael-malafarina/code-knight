@@ -5,6 +5,8 @@ import unit.enemy.skeleton.actions.skeleton.Skewer;
 import animation.Animation;
 import ui.Images;
 import unit.enemy.Enemy;
+import unit.hero.mage.actions.fire.Burn;
+import unit.hero.mage.actions.fire.Emberstorm;
 
 public class Skeleton extends Enemy
 {
@@ -22,9 +24,13 @@ public class Skeleton extends Enemy
 
      //   algorithm.add(new Advance());
 //        algorithm.add(new AetherBlast());
-        algorithm.add(new Skewer());
-        algorithm.add(new Skewer());
-        algorithm.add(new Repel());
 
+
+    }
+
+    public void setAbilities()
+    {
+        addAction(new Skewer());
+        addAction(new Repel());
     }
 }

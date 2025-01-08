@@ -31,14 +31,9 @@ public class StormMage extends Mage
 
     public void setStartingAbilities()
     {
-        algorithm.add(new Zap());
-        algorithm.add(new Zap());
-        algorithm.add(new LightningBolt());
-        algorithm.add(new LightningBolt());
-        algorithm.add(new Tailwind());
-
-       addPerk(new Spellstorm());
-
+       addAction(new Zap());
+       addAction(new ChaosBolt());
+    //   addPerk(new Spellstorm());
     }
 
     public void setUpgradePool()
@@ -53,6 +48,7 @@ public class StormMage extends Mage
         // Attack
         actionPool.add(Zap.class);
         actionPool.add(LightningBolt.class);
+        actionPool.add(Tailwind.class);
     }
 
     public void setCodePool()

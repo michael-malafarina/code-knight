@@ -2,7 +2,9 @@ package unit;
 
 // A unit lives in a cell, has health, can fight.  Is a hero or monster
 
-import unit.ability.Algorithm;
+import campaign.HeroManager;
+import ui.Images;
+import ui.combat.Manabar;
 import unit.ability.action.*;
 import animation.Animation;
 import battlefield.Cell;
@@ -21,8 +23,6 @@ import core.Utility;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import states.combat.Combat;
-import states.combat.CombatState;
-import states.combat.InitiativeQueue;
 import ui.combat.Blockbox;
 import ui.combat.Healthbar;
 import ui.combat.EnergyDiamonds;
@@ -67,7 +67,7 @@ public class Unit implements Comparable<Unit>
     protected Color tint;
     protected int tintTimer;
     protected int turn;
-    protected Image icon;
+    protected Image icon = Images.iconWarden;
 
     protected MovementType movementType;
     protected MovementType movementEffect;
@@ -77,7 +77,7 @@ public class Unit implements Comparable<Unit>
     protected Cell startingCell;
     private Team team;
     protected Animation animation;
-    protected Algorithm algorithm;
+
     protected int delay;
     protected float x;
     protected float y;
@@ -96,6 +96,8 @@ public class Unit implements Comparable<Unit>
 
     // UI Elements
     protected Healthbar healthbar;
+    protected Manabar manabar;
+
     // protected Blockbar blockbar;
 
     protected Blockbox blockbox;
@@ -107,12 +109,13 @@ public class Unit implements Comparable<Unit>
     {
         maxEnergy = 9999;
         energyPerTurn = 1;
-        algorithm = new Algorithm(this);
         isAlive = true;
         maxSpeed = 100;
         curSpeed = 0;  // don't change this, it breaks tooltips ?
         speedPerTurn = 0;
         healthbar = new Healthbar(this);
+        manabar = new Manabar(this);
+
         //     blockbar = new Blockbar(this);
 
         blockbox = new Blockbox(this);
@@ -197,18 +200,6 @@ public class Unit implements Comparable<Unit>
     {
         return curMana;
     }
-
-    public int getManaCostTotal()
-    {
-        int cost = 0;
-        for(Action a : algorithm.getActions())
-        {
-            cost += a.getManaCost();
-        }
-
-        return cost;
-    }
-
 
     public int getMaxMana()
     {
@@ -311,16 +302,15 @@ public class Unit implements Comparable<Unit>
         return isAlive;
     }
 
-    public Algorithm getAlgorithm()
+    public boolean canAct()
     {
-        return algorithm;
+        return isAlive;
     }
 
     public int getTurn()
     {
         return turn;
     }
-
 
     public ModifierSet getModifiers()
     {
@@ -475,7 +465,7 @@ public class Unit implements Comparable<Unit>
         }
 
         // Swap if needed
-        if (otherUnit != null)
+        if (otherUnit != null && oldCell != null)
         {
             oldCell.setUnit(otherUnit);
             otherUnit.cell = oldCell;
@@ -590,6 +580,8 @@ public class Unit implements Comparable<Unit>
             curHealth = 0;
             isAlive = false;
             clearCell();
+
+            HeroManager.updateAlgorithm();
         }
 
 //        if(actualDamage > 0)
@@ -787,6 +779,8 @@ public class Unit implements Comparable<Unit>
     }
 
 
+
+
     public void setPosition(float x, float y)
     {
         this.x = x;
@@ -796,15 +790,7 @@ public class Unit implements Comparable<Unit>
 
     }
 
-    public void addAction(Action action)
-    {
-        algorithm.add(action);
-    }
 
-    public void replaceAction(Action action)
-    {
-        algorithm.replace(action);
-    }
 
     public void resetPosition()
     {
@@ -849,7 +835,6 @@ public class Unit implements Comparable<Unit>
 
 
         animation.setPaused(false);
-        algorithm.reset();
         turn = 1;
     }
 
@@ -918,16 +903,7 @@ public class Unit implements Comparable<Unit>
 
     // Main Event Loops
 
-    public void updateActions()
-    {
-        if (Combat.inActionMode() && Combat.getActingUnit() == this)
-        {
-            getAlgorithm().getNextAction().update();
-            getAlgorithm().getNextAction().setMovement();      // sets the movement method
-            movement();
 
-        }
-    }
 
 
     /*****************************************************************\
@@ -960,41 +936,26 @@ public class Unit implements Comparable<Unit>
 
     }
 
-    public void act(Action a)
-    {
-        if (Combat.isBattleOver())
-        {
-            return;
-        }
-
-        if (a.canUse())
-        {
-            a.activate();
-
-
-        }
-    }
-
-
     public void render(Graphics g)
     {
         if (isAlive())
         {
-            if (Combat.getCombatState() == CombatState.BATTLE && Combat.inActionMode() && Combat.getActingUnit() == this)
-            {
-                g.setColor(new Color(255, 255, 0, 100));
-                g.fillOval(getX(), getY() + getHeight() * .80f, getWidth(), getHeight() * .22f);
-
-                // Double outline
-                g.setLineWidth(5);
-                g.setColor(new Color(255, 255, 0, 200));
-                g.drawOval(getX(), getY() + getHeight() * .80f, getWidth(), getHeight() * .22f - 4);
-                g.drawOval(getX(), getY() + getHeight() * .80f, getWidth(), getHeight() * .22f);
-                g.setLineWidth(1);
-            }
+//            if (Combat.getCombatState() == CombatState.BATTLE && Combat.inActionMode() && Combat.getActingUnit() == this)
+//            {
+//                g.setColor(new Color(255, 255, 0, 100));
+//                g.fillOval(getX(), getY() + getHeight() * .80f, getWidth(), getHeight() * .22f);
+//
+//                // Double outline
+//                g.setLineWidth(5);
+//                g.setColor(new Color(255, 255, 0, 200));
+//                g.drawOval(getX(), getY() + getHeight() * .80f, getWidth(), getHeight() * .22f - 4);
+//                g.drawOval(getX(), getY() + getHeight() * .80f, getWidth(), getHeight() * .22f);
+//                g.setLineWidth(1);
+//            }
 
             animation.render(g);
             healthbar.render(g);
+            manabar.render(g);
             blockbox.render(g);
 
         }
@@ -1025,10 +986,10 @@ public class Unit implements Comparable<Unit>
     public void startTurn()
     {
 
-        if (getAlgorithm().getFirstAction() == getAlgorithm().getNextAction())
-        {
+//        if (getAlgorithm().getFirstAction() == getAlgorithm().getNextAction())
+//        {
             resetBlock();
-        }
+//        }
          gainMana(getManaPerTurn());
         addSpeed(getSpeedPerTurn());
         addEnergy(getEnergyPerTurn());
@@ -1050,16 +1011,12 @@ public class Unit implements Comparable<Unit>
     public void endTurn()
     {
 
-        clearMovement();
+
         increaseTurn();
         getAnimation().setPaused(false);
         getModifiers().triggerEndTurn();
-        addDelay(InitiativeQueue.DELAY_PER_TURN);
 
-        if (algorithm.getNextAction().isDisabled())
-        {
-            algorithm.advanceAlgorithm();
-        }
+
     }
 
     public void endBattle()
@@ -1135,9 +1092,8 @@ public class Unit implements Comparable<Unit>
         this.movementEffect = move;
     }
 
-    public void movement()
+    public void movement(Action action)
     {
-        Action action = Combat.getCurrentAction();
         int totalTime = action.getTime();
 
         if (movementType == null)
@@ -1154,43 +1110,43 @@ public class Unit implements Comparable<Unit>
 
         if (movementType.equals(MovementType.CAST))
         {
-            cast(totalTime, movementSpeed);
+            cast(action, totalTime, movementSpeed);
         }
         else if (movementType.equals(MovementType.BLOCK))
         {
-            step(totalTime, movementSpeed);
+            step(action, totalTime, movementSpeed);
         }
         else if (movementType.equals(MovementType.STEP))
         {
-            step(totalTime, movementSpeed);
+            step(action, totalTime, movementSpeed);
         }
         else if (movementType.equals(MovementType.RUSH))
         {
-            rush(totalTime, movementSpeed);
+            rush(action, totalTime, movementSpeed);
         }
     }
 
-    public void cast(int totalTime, float speed)
+    public void cast(Action action, int totalTime, float speed)
     {
         // move during the first part
-        if (Combat.getActionTimer() >= totalTime * .90)
+        if (action.getTimer() <= totalTime * .10)
         {
             x += speed * .75f;
 //            xMovementOffset += speed * .75f;
         }
 
         // back in the latter part
-        if (Combat.getActionTimer() <= totalTime * .10)
+        if (action.getTimer() >= totalTime * .90)
         {
             x -= speed * .75f;
 //            xMovementOffset -= speed * .75f;
         }
     }
 
-    public void block(int totalTime, float speed)
+    public void block(Action action, int totalTime, float speed)
     {
         // move during the first part
-        if (Combat.getActionTimer() >= totalTime * .65 && Combat.getActionTimer() <= totalTime * .75)
+        if (action.getTimer() >= totalTime * .25 && action.getTimer() <= totalTime * .35)
         {
             x -= speed * .75f;
 //            xMovementOffset -= speed * .75f;
@@ -1198,42 +1154,44 @@ public class Unit implements Comparable<Unit>
         }
 
         // back in the latter part
-        if (Combat.getActionTimer() <= totalTime * .35 && Combat.getActionTimer() >= totalTime * .25)
+        if (action.getTimer() <= totalTime * .75 && action.getTimer() >= totalTime * .65)
         {
             x = speed * .75f;
 //            xMovementOffset += speed * .75f;
         }
     }
 
-    public void step(int totalTime, float speed)
+    public void step(Action action, int totalTime, float speed)
     {
         // move during the first part
-        if (Combat.getActionTimer() >= totalTime * .85)
+        if (action.getTimer() <= totalTime * .15)
         {
             x += speed;
 //            xMovementOffset += speed;
         }
 
         // back in the latter part
-        if (Combat.getActionTimer() <= totalTime * .15)
+        if (action.getTimer() >= totalTime * .85)
         {
             x -= speed;
 //            xMovementOffset -= speed;
         }
     }
 
-    public void rush(int totalTime, float speed)
+    public void rush(Action action, int totalTime, float speed)
     {
+//        System.out.println(action.getTimer() + " / " + totalTime);
+
         // Rush from 35% to 50%
-        if (Combat.getActionTimer() >= totalTime * .50 && Combat.getActionTimer() <= totalTime * .65)
+        if (action.getTimer() >= totalTime * .30 && action.getTimer() <= totalTime * .45)
         {
             x += speed * 3;
 //            xMovementOffset -= speed * 3;
 
         }
 
-        // Return from 45% to end
-        if (Combat.getActionTimer() <= totalTime * .45)
+        // Return from 55% to end
+        if (action.getTimer() >= totalTime * .55)
         {
             x -= speed;
 //            xMovementOffset -= speed;

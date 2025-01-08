@@ -5,12 +5,13 @@ public class IfHighMana extends Conditional
     public void setup()
     {
         super.setup();
-        name = "If High Mana";
+        name = "If Mana > 50%";
     }
 
     public boolean conditionIsTrue()
     {
-        return self.getCurMana() >= self.getMaxMana() / 2;
+        return getAlgorithm().getNextAction().getUnit().getCurMana() >=
+                getAlgorithm().getNextAction().getUnit().getMaxMana() / 2;
     }
 
     public String getDescription()

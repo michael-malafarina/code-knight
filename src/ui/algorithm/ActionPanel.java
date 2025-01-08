@@ -1,5 +1,6 @@
 package ui.algorithm;
 
+import core.Utility;
 import unit.ability.action.Action;
 import unit.ability.action.code.Code;
 import unit.ability.action.code.LinkedCode;
@@ -27,17 +28,16 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
 
     public boolean indented = false;
 
-    public static final int INDENT = 3;
-    public static final int HEIGHT = 8;
+    public static final int INDENT = 4;
+    public static final int HEIGHT = 9;
     private int index;
 
     protected Action action;
     protected Action previous;
-    protected int diamondSize;
 
     protected boolean deleteTarget;
 
-    public static final float SPACING = 1.5f;
+    public static final float SPACING = 1.4f;
     AlgorithmDisplay owner;
 
     float yBase;
@@ -49,24 +49,39 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
         // Action
         this.action = action;
         this.owner = owner;
-        index = action.getUnit().getAlgorithm().getIndex(action);
+        index = owner.getAlgorithm().getIndex(action);
 
         // Size
         height = HEIGHT * Main.getGameScale();
-        width = owner.getWidth() * .72f;
+        width = owner.getWidth() * .80f;
 
         // Position
-        this.yBase = Main.getScreenHeight() * .095f;
+        this.yBase = owner.getY() + Main.getScreenHeight() * .01f;
 
         // Tooltip
         setTooltips();
 
         // Icon and Font
         iconBuffer = Main.getScreenWidth() * .007f;
-        icon = action.getIcon();
-        iconSize = height * .7f;
-        diamondSize = (int) (3f * Main.getGameScale());
-        nameFont = Fonts.smallFont;
+
+        if(action instanceof Code)
+        {
+            icon = action.getIcon();
+        }
+        else
+        {
+            icon = action.getUnit().getIcon();
+
+            if(action.getUnit().getTeam() == Team.PLAYER)
+            {
+                icon = icon.getFlippedCopy(true, false);
+            }
+        }
+
+
+
+        iconSize = height * .9f;
+        nameFont = Fonts.mediumFontMono;
 
     }
 
@@ -93,9 +108,14 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
         {
             return Mouse.getX() - width / 2;
         }
-        if (action.getUnit().isAlive())
-        {
-            if (index > 0 && owner.getActionPanel(index - 1).getAction() instanceof LinkedCode)
+//        if (action.getUnit().isAl        if(action.getTeam().getAlgorithm().getPreviousAction() instanceof Code)
+//        {
+//
+//        }ive())
+//        {
+        //if(action.getTeam().getAlgorithm().getPreviousAction() instanceof Code)
+            if (index > 0 && owner.getActionPanel(index - 1).getAction() instanceof LinkedCode &&
+                !(action instanceof LinkedCode))
             {
                 indented = true;
                 return owner.getX() + iconBuffer + iconSize + INDENT * Main.getGameScale();
@@ -105,11 +125,11 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
                 indented = false;
                 return owner.getX() + iconBuffer + iconSize;
             }
-        }
-        else
-        {
-            return 0;
-        }
+//        }
+//        else
+//        {
+//            return owner.getX() + iconBuffer + iconSize + INDENT * Main.getGameScale();
+//        }
 
     }
 
@@ -183,7 +203,11 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
         x = getX();
         y = getY();
 
-        if (Combat.getCurrentAction() == action && action != null && action == action.getUnit().getAlgorithm().getNextAction())
+        Action current = Combat.getCurrentTeam().getAlgorithm().getCurrentAction();
+
+
+
+        if (action != null && current != null && action == current)
         {
             setHighlighted(true);
         }
@@ -197,12 +221,12 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
         if (action instanceof Code)
         {
             nameColor = Color.white;
-            bgColor = new Color(50, 50, 50, 255);
+            bgColor = new Color(45, 80, 65, 255);
 
             if (action.isDisabled())
             {
                 nameColor = new Color(130, 130, 130);
-                bgColor = new Color(30, 30, 30, 255);
+                bgColor = new Color(20, 50, 35, 255);
             }
         }
 
@@ -217,8 +241,11 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
 
 
             nameColor = getAction().getRarity().getColor();
+
+            Color c = getAction().getUnit().getClassColor();
 //            bgColor = new Color(20, 40, 80, 255);
-            bgColor = new Color(40, 40, 40, 255);
+            bgColor = new Color(c.r * .1f+.1f, c.g * .1f+.1f, c.b * .1f+.1f, 255);
+
 
             if (action.isDisabled())
             {
@@ -268,9 +295,18 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
         renderManaCost(g);
     }
 
+    public void movingActionCards(int button, int x, int y)
+    {
+
+            mousePressed(button, x, y);
+
+
+    }
+
+
     public void renderTooltip(Graphics g)
     {
-        if (hasTooltip() && isMouseOver() && !owner.getOwner().hasGrabbedActionPanel())
+        if (hasTooltip() && isMouseOver() && !owner.hasGrabbedPanel())
         {
             float previousHeight = 0;
             for(int i = 0; i < tooltips.size(); i++)
@@ -296,41 +332,41 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
             return;
         }
 
-        float w = getWidth() * .19f;
-        float h = width * .19f;
+        float w = HEIGHT * Main.getGameScale() * .8f;
+        float h = HEIGHT * Main.getGameScale() * .8f;
 
         float indentBoxX = getWidth() * .88f - w / 2;
         float indentBoxY = height / 2 - h / 2 + 1;
         float indentTextX = getWidth() * .88f;
         float indentTextY = height / 2 + 1;
 
-        Image diamond;
+        Image manaBox;
 
         if (action.isDisabled())
         {
             if (action.getManaCost() > action.getUnit().getCurMana())
             {
-                diamond = Images.manaBoxRedEmpty;
+                manaBox = Images.manaBoxRedEmpty;
             }
             else
             {
-                diamond = Images.manaBoxBlueEmpty;
+                manaBox = Images.manaBoxBlueEmpty;
             }
         }
         else
         {
             if (action.getManaCost() > action.getUnit().getCurMana())
             {
-                diamond = Images.manaBoxRed;
+                manaBox = Images.manaBoxRed;
             }
             else
             {
-                diamond = Images.manaBoxBlue;
+                manaBox = Images.manaBoxBlue;
             }
         }
 
-        diamond.setFilter(Image.FILTER_LINEAR);
-        diamond.draw(getX() + indentBoxX, getY() + indentBoxY, w, h);
+        manaBox.setFilter(Image.FILTER_LINEAR);
+        manaBox.draw(getX() + indentBoxX, getY() + indentBoxY, w, h);
 //        g.setColor(new Color(30, 70, 180));
 //
 //        g.fillRect(x + indentBoxX, y + indentBoxY, w, h);
@@ -353,7 +389,7 @@ public class ActionPanel extends Panel implements Comparable<ActionPanel>
     public void setGrabbed(boolean grabbed)
     {
 //        System.out.println(action.getName() + " grab " + grabbed);
-        if (action.getUnit().isPlayer())
+        if (owner.getTeam() == Team.PLAYER)
         {
             this.grabbed = grabbed;
         }

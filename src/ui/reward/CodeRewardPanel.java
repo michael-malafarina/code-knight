@@ -39,8 +39,8 @@ public class CodeRewardPanel extends ActionRewardPanel
 
     public void giveReward()
     {
-        unit.addAction(action);
-        unit.getAlgorithm().getDisplay().begin();       // updates the display
+//        unit.addAction(action);
+//        unit.getAlgorithm().getDisplay().begin();       // updates the display
 //        action.getUpgrade().applyUpgrade(unit);
         RewardOverlay.end();
 

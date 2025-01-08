@@ -2,6 +2,7 @@ package unit.enemy.goblin;
 
 import animation.Animation;
 import ui.Images;
+import unit.enemy.goblin.actions.general.GoblinBlock;
 import unit.enemy.goblin.actions.general.GoblinPunch;
 import unit.enemy.goblin.actions.reaver.GoblinRage;
 import unit.enemy.goblin.actions.reaver.GoblinSwing;
@@ -22,12 +23,12 @@ public class GoblinReaver extends Goblin
 
      //   algorithm.add(new Advance());
 //        algorithm.add(new AetherBlast());
-        algorithm.add(new GoblinSwing());
-        algorithm.add(new GoblinSwing());
-        algorithm.add(new GoblinRage());
 
+    }
 
-
-
+    public void setAbilities()
+    {
+        addAction(new GoblinSwing());
+        addAction(new GoblinRage());
     }
 }

@@ -1,6 +1,10 @@
 package unit.hero;
 
+import campaign.HeroManager;
+import unit.Team;
 import unit.Unit;
+import unit.ability.action.Action;
+import unit.ability.perks.Perk;
 
 public abstract class Hero extends Unit
 {
@@ -9,14 +13,16 @@ public abstract class Hero extends Unit
 
     public Hero()
     {
+        setTeam(Team.PLAYER);
+
         setup();
         level = 1;
         setPerkPool();
         setUpgradePool();
         setActionPool();
         setCodePool();
-        setStartingAbilities();
         setStartingAttributes();
+
     }
 
     public String getSuperClassName()
@@ -42,4 +48,10 @@ public abstract class Hero extends Unit
     abstract public void setPerkPool();
     abstract public void setStartingAbilities();
     abstract public void setStartingAttributes();
+
+    public void addAction(Action a)
+    {
+        HeroManager.getAlgorithm().add(a, this);
+    }
+
 }

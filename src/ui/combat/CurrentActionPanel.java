@@ -7,7 +7,6 @@ import core.Color;
 import core.Main;
 import org.newdawn.slick.Graphics;
 import states.combat.Combat;
-import states.combat.InitiativeQueue;
 import ui.Fonts;
 import ui.Text;
 import ui.panel.Panel;
@@ -27,7 +26,7 @@ public class CurrentActionPanel extends Panel
     public void render(Graphics g)
     {
 
-        Action action = Combat.getCurrentAction();
+        Action action = Combat.getCurrentTeam().getAlgorithm().getCurrentAction();
 
         if (action == null)
         {
@@ -52,7 +51,7 @@ public class CurrentActionPanel extends Panel
         }
 
         float xPadding = 6 * Main.getGameScale();
-        name = Combat.getCurrentAction().getName();
+        name = action.getName();
         nameFont = Fonts.hugeFont;
 
         width = xPadding * 2.5f + getNameWidth() + iconSize;

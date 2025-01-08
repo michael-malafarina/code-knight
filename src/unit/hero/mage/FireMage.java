@@ -30,12 +30,9 @@ public class FireMage extends Mage
 
     public void setStartingAbilities()
     {
-        algorithm.add(new Firebolt());
-        algorithm.add(new Firebolt());
-        algorithm.add(new Burn());
-        algorithm.add(new Burn());
-        algorithm.add(new Emberstorm());
-        addPerk(new FireMastery());
+        addAction(new Firebolt());
+        addAction(new ChaosBolt());
+      // addPerk(new FireMastery());
     }
 
     public void setUpgradePool()

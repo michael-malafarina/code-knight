@@ -20,6 +20,19 @@ public class Shock extends Debuff
 		
 	public void onDamageTaken(DamageType type, Ability source)
 	{
+		// MAY BE CAUSING CONCURRENT MODIFICATION ISSUE
+		/*
+
+		java.util.ConcurrentModificationException
+	at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1096)
+	at java.base/java.util.ArrayList$Itr.next(ArrayList.java:1050)
+	at unit.ability.ModifierSet.triggerOnDamageTaken(ModifierSet.java:595)
+	at unit.Unit.takeDamage(Unit.java:550)
+	at unit.ability.action.Action.damage(Action.java:716)
+	at unit.hero.mage.actions.storm.Zap.use(Zap.java:34)
+	at unit.ability.action.Action.middle(Action.java:583)
+
+		 */
 		if(source instanceof Shock)
 		{
 			return;

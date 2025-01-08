@@ -1,4 +1,4 @@
-package unit.hero.knight.actions.paladin;
+package unit.hero.knight.actions;
 
 import core.Color;
 import ui.Images;

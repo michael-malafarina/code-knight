@@ -181,8 +181,10 @@ public class ActionRewardPanel extends RewardPanel
     @Override
     public void giveReward()
     {
-        unit.replaceAction(action);
-        unit.getAlgorithm().getDisplay().begin();       // updates the display
+        unit.addAction(action);
+
+//        unit.replaceAction(action);
+//        unit.getAlgorithm().getDisplay().begin();       // updates the display
 //        action.getUpgrade().applyUpgrade(unit);
 
         RewardOverlay.end();

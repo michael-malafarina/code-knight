@@ -4,8 +4,7 @@ import animation.Animation;
 import core.Color;
 import ui.Images;
 import unit.ability.action.Upgrade;
-import unit.hero.knight.actions.AttackKnight;
-import unit.hero.knight.actions.paladin.Defend;
+import unit.hero.knight.actions.Defend;
 import unit.hero.knight.actions.paladin.HolyShield;
 import unit.hero.knight.actions.paladin.LayOnHands;
 import unit.hero.knight.actions.paladin.ValiantStrike;
@@ -36,12 +35,9 @@ public class Paladin extends Knight
 
     public void setStartingAbilities()
     {
-        algorithm.add(new ValiantStrike());
-        algorithm.add(new ValiantStrike());
-        algorithm.add(new Defend());
-        algorithm.add(new Defend());
-        algorithm.add(new LayOnHands());
-        addPerk(new AuraOfCourage());
+        addAction(new ValiantStrike());
+        addAction(new Defend());
+//        addPerk(new AuraOfCourage());
     }
 
     public void setUpgradePool()
@@ -58,7 +54,6 @@ public class Paladin extends Knight
         actionPool.add(HolyShield.class);
         actionPool.add(LayOnHands.class);
         actionPool.add(ValiantStrike.class);
-        actionPool.add(Defend.class);
 
     }
 

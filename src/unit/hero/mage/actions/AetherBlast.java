@@ -83,7 +83,7 @@ public class AetherBlast extends Action
                 currentType = DamageType.COLD;
                 animate(Images.animCold, getTarget());
                 break;
-            case 2:
+            default:
                 currentType = DamageType.LIGHTNING;
                 animate(Images.animHoly, getTarget());
                 break;

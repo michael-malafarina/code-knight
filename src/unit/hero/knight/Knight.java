@@ -43,6 +43,7 @@ public abstract class Knight extends Hero
         actionPool.add(ShieldBash.class);
 
         // Block
+        actionPool.add(Defend.class);
         actionPool.add(Protect.class);
         actionPool.add(RaiseShield.class);
         actionPool.add(SteelYourself.class);
@@ -54,12 +55,8 @@ public abstract class Knight extends Hero
     public void setCodePool()
     {
         codePool.add(IfFirstUse.class);
-        codePool.add(IfNoBlock.class);
-        codePool.add(IfHasBlock.class);
-        codePool.add(IfHighHealth.class);
         codePool.add(IfLowHealth.class);
         codePool.add(IfEnemyLowHealth.class);
-        codePool.add(IfEnemyHighHealth.class);
     }
 
     public void setPerkPool()

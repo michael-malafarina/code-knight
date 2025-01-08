@@ -48,9 +48,7 @@ public abstract class Mage extends Hero
         codePool.add(IfFirstUse.class);
         codePool.add(IfMultipleEnemies.class);
         codePool.add(IfEnemyLowHealth.class);
-        codePool.add(IfEnemyHighHealth.class);
         codePool.add(IfHighMana.class);
-        codePool.add(IfLowMana.class);
     }
 
     @Override

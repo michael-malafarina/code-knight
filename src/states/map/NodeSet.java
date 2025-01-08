@@ -128,7 +128,7 @@ public class NodeSet
             newNode = new RecruitNode(this, x, y);
             newNode.setOrigin();
         }
-        else if (stage == 1 || stage == 4 || stage == 7)
+        else if (stage == 1 || stage == 2)
         {
             newNode = new RecruitNode(this, x, y);
         }

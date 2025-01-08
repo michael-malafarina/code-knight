@@ -7,7 +7,7 @@ import unit.ability.action.Upgrade;
 import ui.Images;
 import ui.sound.Sounds;
 
-public class HealingLight extends Action
+public class MendWounds extends Action
 {
     public void setup()
     {

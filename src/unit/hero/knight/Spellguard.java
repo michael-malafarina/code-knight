@@ -33,11 +33,7 @@ public class Spellguard extends Knight
 
     public void setStartingAbilities()
     {
-        algorithm.add(new AttackKnight());
-        algorithm.add(new AttackKnight());
-        algorithm.add(new AttackKnight());
-        algorithm.add(new HolyShield());
-        algorithm.add(new Fortify());
+        addAction(new Fortify());
         addPerk(new ReactiveShield());
     }
 

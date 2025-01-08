@@ -2,6 +2,8 @@ package unit.enemy.goblin;
 
 import animation.Animation;
 import ui.Images;
+import unit.enemy.goblin.actions.rogue.GoblinGrenade;
+import unit.enemy.goblin.actions.rogue.GoblinPoisonStab;
 import unit.enemy.goblin.actions.shaman.GoblinCurse;
 import unit.enemy.goblin.actions.shaman.GoblinHeal;
 
@@ -20,10 +22,14 @@ public class GoblinShaman extends Goblin
         addSpeedPerTurn(5);
         addMaxMana(16);
 
-        algorithm.add(new GoblinCurse());
-        algorithm.add(new GoblinCurse());
-        algorithm.add(new GoblinCurse());
-        algorithm.add(new GoblinHeal());
 
+
+    }
+
+    public void setAbilities()
+    {
+        addAction(new GoblinCurse());
+        addAction(new GoblinCurse());
+//        addAction(new GoblinHeal());
     }
 }

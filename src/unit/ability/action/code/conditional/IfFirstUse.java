@@ -10,7 +10,7 @@ public class IfFirstUse extends Conditional
 
     public boolean conditionIsTrue()
     {
-        return self().getAlgorithm().getActionAfter(this).isUsed();
+        return !getAlgorithm().getNextAction().isUsed();
     }
 
     public String getDescription()

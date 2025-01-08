@@ -2,17 +2,21 @@ package unit.ability.action.code.conditional;
 
 import unit.Unit;
 
+import java.util.ArrayList;
+
 public class IfEnemyLowHealth extends Conditional
 {
     public void setup()
     {
         super.setup();
-        name = "If Enemy Low Health";
+        name = "If Enemy Health < 50%";
     }
 
     public boolean conditionIsTrue()
     {
-        for(Unit u : getEnemies())
+        ArrayList<Unit> units = getTeam().getEnemyRow().getUnits();
+
+        for(Unit u : units)
         {
             if(u.isLowHealth())
             {

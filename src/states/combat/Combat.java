@@ -1,5 +1,7 @@
 package states.combat;
 
+import unit.Team;
+import unit.ability.Algorithm;
 import unit.ability.action.Action;
 import animation.AnimationManager;
 import battlefield.Battlefield;
@@ -31,23 +33,16 @@ public class Combat extends BasicGameState
 
     private static CombatState combatState;
 
-    private static Action currentAction;
 
-    private static int actionTimer;
     private static boolean actionMode;
-    private static Unit actingUnit;
     private static boolean rewardGranted;
 
     private static int timer;
 
-    private static InitiativeQueue initiativeQueue;
     private static CombatHUD combatHUD;
+    private static Team currentTeam = Team.PLAYER;
+
     // Constructor and Init
-
-    public static final int TURN_SWITCH_TIMER = 60;
-    private static int nextTurnTimer = 0;
-
-
     public Combat(int id)
     {
         this.id = id;
@@ -57,7 +52,6 @@ public class Combat extends BasicGameState
     {
         this.sbg = sbg;
         gc.setShowFPS(false);
-        initiativeQueue = new InitiativeQueue();
         combatHUD = new CombatHUD();
     }
 
@@ -83,10 +77,6 @@ public class Combat extends BasicGameState
         return rewardGranted;
     }
 
-    public static Unit getActingUnit()
-    {
-        return actingUnit;
-    }
 
     public static ArrayList<Unit> getUnits()
     {
@@ -95,20 +85,26 @@ public class Combat extends BasicGameState
         return units;
     }
 
-    public static Action getCurrentAction()
+    public static ArrayList<Unit> getUnits(Team team)
     {
-        if (actingUnit == null)
+        ArrayList<Unit> units = new ArrayList<>();
+
+        for(Unit u : getUnits())
         {
-            return null;
+            if(u.getTeam() == team)
+            {
+                units.add(u);
+            }
         }
 
-        return currentAction;
+        return units;
     }
 
-    public static int getActionTimer()
-    {
-        return actionTimer;
-    }
+
+public static Team getCurrentTeam()
+{
+    return currentTeam;
+}
 
     public static int getTimer()
     {
@@ -165,8 +161,6 @@ combatState = state;
         }
 
         combatHUD.update();
-
-
     }
 
 
@@ -186,19 +180,68 @@ combatState = state;
         {
             if (!isBattleOver())
             {
-//                if(actingUnit != null)
-//                {
-//                    System.out.println(currentAction);
-//                }
-
-
-                updateBattleTimers();
-                advanceTurn();
-                useFunction();
-                endTurn();
+                combatRound(currentTeam);
             }
             endBattle();
         }
+    }
+
+
+    public void combatRound(Team team)
+    {
+        Algorithm algorithm = team.getAlgorithm();
+        Action action = team.getAlgorithm().getCurrentAction();
+
+        // Start turn for all units if we're on a fresh algorithm
+        if(algorithm.atStart() && !action.isActive())
+        {
+            for(Unit u : getUnits(team))
+            {
+                u.startTurn();
+            }
+        }
+
+        // Start actions that are not active
+        if(!action.isActive())
+        {
+            action.start();
+        }
+
+        // Update the current action
+        action.update();
+
+        // Update the algorithm to disable things based on stuns, kills, etc.
+        algorithm.update();
+
+
+        // If it finished, then advance the algorithm and reset positions
+        if(!action.isActive())
+        {
+
+            algorithm.advanceAlgorithm();
+
+            for(Unit u : getUnits())
+            {
+                u.clearMovement();
+                u.setCellLaterResolution();
+            }
+        }
+
+        // If the algorithm is done, end turn for all
+        if(algorithm.isDone())
+        {
+            for(Unit u : getUnits(team))
+            {
+                u.endTurn();
+            }
+
+            algorithm.reset();
+            currentTeam = team.getOpponent();
+        }
+    }
+
+    public void executeAction()
+    {
 
     }
 
@@ -214,8 +257,12 @@ combatState = state;
 
     private void endBattle()
     {
+
+
         if (wonBattle() && combatState == CombatState.BATTLE && !rewardGranted)
         {
+            HeroManager.getAlgorithm().reset();
+
             RewardOverlay.begin();
             rewardGranted = true;
             combatState = CombatState.END;
@@ -224,6 +271,9 @@ combatState = state;
             {
                 Sounds.combatWin.play();
             }
+
+
+
 
             for(Unit u : HeroManager.getUnits())
             {
@@ -239,149 +289,152 @@ combatState = state;
 
         if (lostBattle())
         {
-            HeroManager.newParty();
             resetBattle();
+            HeroManager.newParty();
             sbg.enterState(Main.LOSE_ID);
         }
     }
 
-    public static void assignCurrentAction(Action a)
-    {
-        currentAction = a;
-        a.resetTarget();
-        actingUnit = a.getUnit();
-        actionTimer = a.getTime();
-        actionMode = true;
-    }
+//    public static void assignCurrentAction(Action a)
+//    {
+//        currentAction = a;
+//        a.resetTarget();
+//        actingUnit = a.getUnit();
+//        currentActionTimer = a.getTime();
+//        actionMode = true;
+//    }
 
 
-    public static void startTurn(Unit u)
-    {
-        actionMode = true;
-        actingUnit = u;
-        actingUnit.startTurn();
-
-        Action nextAction = actingUnit.getAlgorithm().getNextAction();
-
-        if (nextAction.canUse())
-        {
-            assignCurrentAction(nextAction);
-        }
-        else if(actingUnit.getTurn() == 1)      // special case for if you can't use anything this turn
-        {
-            forceEndTurn();
-        }
-    }
-
-
-    public void useFunction()
-    {
-        if (!actionMode)
-        {
-            return;
-        }
-
-        if (actionTimer == getCurrentAction().getTime() / 2)
-        {
-//            System.out.println(actingUnit + " uses " + currentAction);
-
-            actingUnit.act(currentAction);
-        }
-    }
-
-    public static void endTurn()
-    {
-        // Only end turn if time is up
-        if (!actionMode)
-        {
-            return;
-        }
-
-        if (!actingUnit.isAlive())
-        {
-            forceEndTurn();
-            return;
-        }
-
-        if (actionTimer > 0)
-        {
-            return;
-        }
-
-        // If we got this far, turn is over.  End all movements and resolve positions
-
-        for(Unit u : getUnits())
-        {
-            u.clearMovement();
-            u.setCellLaterResolution();
-        }
-
-        // Add the next action if we can do so
-        if (actingUnit.getAlgorithm().getFutureAction() != null && actingUnit.getAlgorithm().getFutureAction().canUse())
-        {
-            actingUnit.getAlgorithm().advanceAlgorithm();
-            assignCurrentAction(actingUnit.getAlgorithm().getNextAction());
-        }
-        else
-        {
-            forceEndTurn();
-        }
-    }
-
-    public static void forceEndTurn()
-    {
-
-//        System.out.println(actingUnit + " is ending turn");
-
-
-        actingUnit.endTurn();
-        actionMode = false;
-        actingUnit = null;
-        actionTimer = 0;
-        nextTurnTimer = TURN_SWITCH_TIMER;
-
-//        System.out.println(actingUnit + " has ended");
-
-
-    }
-
-    public void updateBattleTimers()
-    {
-        // If between turns, tick turn timer
-        if (actingUnit == null && nextTurnTimer > 0)
-        {
-            nextTurnTimer--;
-        }
-
-        // If we are in the middle of a turn, tick action timer
-        else if (actingUnit != null && actionTimer > 0)
-        {
-            actionTimer--;
-            actingUnit.updateActions();
-        }
-
-//        if(actionTimer > 0)
-//        {
-//            for(Unit u : getUnits())
-//            {
-//                u.movementEffect();
-//            }
+//    public static void startTurn(Unit u)
+//    {
+//        actionMode = true;
+//        actingUnit = u;
+//        actingUnit.startTurn();
 //
+//        Action nextAction = actingUnit.getAlgorithm().getNextAction();
+//
+//        if (nextAction.canUse())
+//        {
+//            assignCurrentAction(nextAction);
 //        }
+//        else if(actingUnit.getTurn() == 1)      // special case for if you can't use anything this turn
+//        {
+//            forceEndTurn();
+//        }
+//    }
 
 
+//    public void useFunction()
+//    {
+//        if (!actionMode)
+//        {
+//            return;
+//        }
+//
+//        if (currentActionTimer == getCurrentAction().getTime() / 2)
+//        {
+////            System.out.println(actingUnit + " uses " + currentAction);
+//
+//            actingUnit.act(currentAction);
+//        }
+//    }
 
-    }
+//    public static void endTurn()
+//    {
+//        // Only end turn if time is up
+//        if (!actionMode)
+//        {
+//            return;
+//        }
+//
+//        if (!actingUnit.isAlive())
+//        {
+//            forceEndTurn();
+//            return;
+//        }
+//
+//        if (currentActionTimer > 0)
+//        {
+//            return;
+//        }
+//
+//        // If we got this far, turn is over.  End all movements and resolve positions
+//
+//        for(Unit u : getUnits())
+//        {
+//            u.clearMovement();
+//            u.setCellLaterResolution();
+//        }
+//
+//        // Add the next action if we can do so
+//        if (actingUnit.getAlgorithm().getFutureAction() != null && actingUnit.getAlgorithm().getFutureAction().canUse())
+//        {
+//            actingUnit.getAlgorithm().advanceAlgorithm();
+//            assignCurrentAction(actingUnit.getAlgorithm().getNextAction());
+//        }
+//        else
+//        {
+//            forceEndTurn();
+//        }
+//    }
 
-    public void advanceTurn()
-    {
-        // If no active unit and time is up, go to next unit
+//    public static void forceEndTurn()
+//    {
+//
+////        System.out.println(actingUnit + " is ending turn");
+//
+//
+//        actingUnit.endTurn();
+//        actionMode = false;
+//        actingUnit = null;
+//        currentActionTimer = 0;
+//        nextActionTimer = TURN_SWITCH_TIMER;
+//
+////        System.out.println(actingUnit + " has ended");
+//
+//
+//    }
 
-        if (actingUnit == null && nextTurnTimer == 0)
-        {
-            InitiativeQueue.tick();
-        }
-    }
+//    public void updateBattleTimers()
+//    {
+//        // If between turns, tick turn timer
+//        if (actingUnit == null && nextActionTimer > 0)
+//        {
+//            nextActionTimer--;
+//        }
+//
+//        // If we are in the middle of a turn, tick action timer
+//        else if (actingUnit != null && currentActionTimer > 0)
+//        {
+//            currentActionTimer--;
+//
+//            currentAction.update();
+//            currentAction.setMovement();
+//            actingUnit.movement();
+//        }
+//
+////        if(actionTimer > 0)
+////        {
+////            for(Unit u : getUnits())
+////            {
+////                u.movementEffect();
+////            }
+////
+////        }
+//
+//
+//
+//    }
+
+//    public void nextAction()
+//    {
+//        // If no active unit and time is up, go to next unit
+//
+//        if (actingUnit == null && nextActionTimer == 0)
+//        {
+//            currentAction =
+//        }
+//    }
 
     public void resetBattle()
     {
@@ -390,10 +443,10 @@ combatState = state;
         AnimationManager.clear();
         combatHUD.clear();
         combatState = CombatState.SETUP;
-        actionTimer = 0;
+//        currentActionTimer = 0;
         actionMode = false;
-        actingUnit = null;
-        nextTurnTimer = 0;
+//        actingUnit = null;
+//        nextActionTimer = 0;
         rewardGranted = false;
 
     }
@@ -474,7 +527,6 @@ combatState = state;
         EnemyManager.buildEncounter();
 
         // Start up initiative
-        InitiativeQueue.begin(getUnits());
         combatHUD.begin();
         combatState = CombatState.SETUP;
 
@@ -488,7 +540,6 @@ combatState = state;
     public void startBattleMode()
     {
         Combat.setCombatState(CombatState.BATTLE);
-        InitiativeQueue.begin(getUnits());
 
         for(Unit u : HeroManager.getUnits())
         {

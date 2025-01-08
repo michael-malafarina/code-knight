@@ -5,6 +5,8 @@ import unit.enemy.skeleton.actions.skeletonArcher.Shoot;
 import animation.Animation;
 import ui.Images;
 import unit.enemy.Enemy;
+import unit.hero.mage.actions.fire.Burn;
+import unit.hero.mage.actions.fire.Emberstorm;
 
 public class SkeletonArcher extends Enemy
 {
@@ -20,9 +22,13 @@ public class SkeletonArcher extends Enemy
 
         addMaxHealth(30);
 
-        algorithm.add(new Shoot());
-        algorithm.add(new Aim());
-        algorithm.add(new Shoot());
 
+
+    }
+
+    public void setAbilities()
+    {
+        addAction(new Shoot());
+        addAction(new Aim());
     }
 }

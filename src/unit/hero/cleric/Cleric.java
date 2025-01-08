@@ -47,9 +47,8 @@ public abstract class Cleric extends Hero
 
     public void setCodePool()
     {
-        codePool.add(IfAllyHighHealth.class);
-        codePool.add(IfAllyLowHealth.class);
-        codePool.add(IfLowMana.class);
+        codePool.add(IfPartyLowHealth.class);
+        codePool.add(IfHeroLowHealth.class);
         codePool.add(IfHighMana.class);
     }
 

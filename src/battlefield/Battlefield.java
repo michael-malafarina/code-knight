@@ -1,5 +1,6 @@
 package battlefield;
 
+import core.Color;
 import core.Main;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -46,7 +47,24 @@ public class Battlefield
 
     public static void render(Graphics g)
     {
-        background.draw(0, 0, Main.getScreenWidth(), Main.getScreenHeight());
+        Images.abstractBorder.draw(0, 0, Main.getScreenWidth(), Main.getScreenHeight());
+
+        g.setColor(new Color(10, 10, 10, 200));
+
+        g.fillRect(0, 0, Main.getScreenWidth(), Main.getScreenHeight());
+
+    //    g.setBackground(new Color(10, 10, 10));
+        background.draw(Main.getScreenWidth() * .15f, Main.getScreenHeight() * .10f,
+                          Main.getScreenWidth() * .70f, Main.getScreenHeight() * .8f);
+
+
+
+        g.setColor(Color.black);
+        g.setLineWidth(6);
+        g.drawRect(Main.getScreenWidth() * .15f, Main.getScreenHeight() * .10f,
+                Main.getScreenWidth() * .70f, Main.getScreenHeight() * .8f);
+        g.resetLineWidth();
+
         CombatHUD.renderCells(g);
     }
 }

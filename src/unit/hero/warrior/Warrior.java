@@ -3,6 +3,7 @@ package unit.hero.warrior;
 import unit.ability.action.Upgrade;
 import unit.ability.action.code.conditional.*;
 import core.Color;
+import unit.hero.warrior.actions.vanguard.Charge;
 import unit.hero.warrior.actions.warden.Lacerate;
 import unit.hero.warrior.actions.warden.Slash;
 import unit.hero.warrior.perks.BoundlessEndurance;
@@ -29,12 +30,7 @@ public class Warrior extends Hero
 
     public void setStartingAbilities()
     {
-        algorithm.add(new AttackWarrior());
-        algorithm.add(new AttackWarrior());
-        algorithm.add(new AttackWarrior());
-        algorithm.add(new Parry());
-        algorithm.add(new Parry());
-        algorithm.add(new SecondWind());
+        addAction(new Parry());
         addPerk(new BoundlessEndurance());
     }
 
@@ -49,6 +45,9 @@ public class Warrior extends Hero
 
     public void setActionPool()
     {
+
+        actionPool.add(Slash.class);
+        actionPool.add(Lacerate.class);
         actionPool.add(Shattersteel.class);
         actionPool.add(Parry.class);
         actionPool.add(DefensiveShift.class);
@@ -58,11 +57,8 @@ public class Warrior extends Hero
 
     public void setCodePool()
     {
+        codePool.add(IfFirstUse.class);
         codePool.add(IfLowHealth.class);
-        codePool.add(IfHighHealth.class);
-        codePool.add(IfNoBlock.class);
-        codePool.add(IfHasBlock.class);
-        codePool.add(IfEnemyHighHealth.class);
         codePool.add(IfEnemyLowHealth.class);
     }
 
@@ -72,7 +68,5 @@ public class Warrior extends Hero
         perkPool.add(Disarm.class);
         perkPool.add(VitalSurge.class);
     }
-
-
 
 }

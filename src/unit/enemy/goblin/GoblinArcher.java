@@ -20,11 +20,11 @@ public class GoblinArcher extends Goblin
         addMaxHealth(55);
         addSpeedPerTurn(15);
 
-        algorithm.add(new GoblinShoot());
-        algorithm.add(new GoblinShoot());
-        algorithm.add(new GoblinAim());
-        algorithm.add(new GoblinSnipe());
 
+    }
 
+    public void setAbilities()
+    {
+        addAction(new GoblinShoot());
     }
 }
